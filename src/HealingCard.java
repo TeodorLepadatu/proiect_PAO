@@ -1,12 +1,12 @@
-public class DefendingCard extends Card{
+public class HealingCard extends Card{
     private final int healPower;
 
-    public DefendingCard(int healPower) {
+    public HealingCard(int healPower) {
         super();
         this.healPower = healPower;
     }
 
-    public DefendingCard(String name, int HP, int healPower) {
+    public HealingCard(String name, int HP, int healPower) {
         super(name, HP);
         this.healPower = healPower;
     }

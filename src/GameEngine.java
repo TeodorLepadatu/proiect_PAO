@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -6,6 +7,7 @@ public class GameEngine {
     private HumanPlayer player2;
     private AIPlayer aiPlayer1;
     private AIPlayer aiPlayer2;
+    private ArrayList<GenericPlayer> players;
 
     private GameEngine instance = null;
 
@@ -20,8 +22,6 @@ public class GameEngine {
             System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
             Scanner scanner = new Scanner(System.in);
-            scenario = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
 
             gameMode = scanner.nextInt();
             scanner.nextLine();
@@ -44,6 +44,8 @@ public class GameEngine {
             HashMap<String, Card> player2Hand = new HashMap<>();
             this.player1 = new HumanPlayer(player1Name, player1Hand);
             this.player2 = new HumanPlayer(player2Name, player2Hand);
+            players.add(this.player1);
+            players.add(this.player2);
         } else if (gameMode == 2) {
             System.out.println("Enter player name: ");
             Scanner scanner = new Scanner(System.in);
@@ -51,9 +53,13 @@ public class GameEngine {
             HashMap<String, Card> playerHand = new HashMap<>();
             this.player1 = new HumanPlayer(playerName, playerHand);
             this.aiPlayer1 = new AIPlayer("AI Player", new HashMap<>());
-        } else if (gameMode == 3) {
+            players.add(this.player1);
+            players.add(this.aiPlayer1);
+        } else {
             this.aiPlayer1 = new AIPlayer("AI Player 1", new HashMap<>());
             this.aiPlayer2 = new AIPlayer("AI Player 2", new HashMap<>());
+            players.add(this.aiPlayer1);
+            players.add(this.aiPlayer2);
         }
     }
     GameEngine getInstance() {
@@ -76,12 +82,53 @@ public class GameEngine {
     }
 
     public void Run() {
+        int turn = 0;
         while(!isGameOver()) {
-            playRound();
+            playRound(turn);
+            turn = (turn + 1)%2;
         }
     }
 
-    private void playRound() {
-        // Implement the logic for a single round of the game
+    private void playRound(int turn) {
+        GenericPlayer currentPlayer = players.get(turn);
+        GenericPlayer opponent = players.get((turn + 1) % 2);
+        System.out.println(currentPlayer.name + "'s turn.");
+
+        if(currentPlayer instanceof HumanPlayer){
+            System.out.println("Choose a card to play:");
+            for (String cardName : currentPlayer.hand.keySet()) {
+                System.out.println(cardName);
+            }
+            Scanner scanner = new Scanner(System.in);
+            String cardName = scanner.nextLine();
+            Card targetCard = null;
+            Card currentCard = currentPlayer.hand.get(cardName);
+            if (currentCard instanceof AttackingCard) {
+                System.out.println("Choose a target card:");
+                for (String targetCardName : opponent.hand.keySet()) {
+                    System.out.println(targetCardName);
+                }
+                String targetCardName = scanner.nextLine();
+                targetCard = opponent.hand.get(targetCardName);
+            }
+            else if(currentCard instanceof HealingCard) {
+                System.out.println("Choose a target card to heal:");
+                for (String targetCardName : currentPlayer.hand.keySet()) {
+                    System.out.println(targetCardName);
+                }
+                String targetCardName = scanner.nextLine();
+                targetCard = currentPlayer.hand.get(targetCardName);
+            }
+            currentPlayer.playCard(cardName, targetCard, opponent);
+        }
+        else if(currentPlayer instanceof AIPlayer) {
+            var cardToPlay = ((AIPlayer) currentPlayer).chooseWhatToPlay();
+            int cardIndex = cardToPlay.get(0);
+            int targetIndex = cardToPlay.get(1);
+            String cardName = (String) currentPlayer.hand.keySet().toArray()[cardIndex];
+            String targetCardName = (String) opponent.hand.keySet().toArray()[targetIndex];
+            Card targetCard = opponent.hand.get(targetCardName);
+            currentPlayer.playCard(cardName, targetCard, opponent);
+        }
     }
 }

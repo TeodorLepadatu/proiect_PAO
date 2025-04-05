@@ -1,12 +1,14 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AIPlayer extends GenericPlayer{
     public AIPlayer(String name, HashMap<String, Card> hand) {
         super(name, hand);
     }
-    private int chooseCardToPlay() {
-        // AI logic to choose a card index to play
-        // For simplicity, let's just return the first card
-        return 0;
+    public ArrayList<Integer> chooseWhatToPlay() {
+        //v[0] = what card to play
+        //v[1] = target card
+        return new ArrayList<Integer>();
     }
+
 }
