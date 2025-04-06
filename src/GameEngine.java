@@ -3,30 +3,29 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class GameEngine {
-    private HumanPlayer player1;
-    private HumanPlayer player2;
-    private AIPlayer aiPlayer1;
-    private AIPlayer aiPlayer2;
     private ArrayList<GenericPlayer> players;
-
-    private GameEngine instance = null;
+    private final int scenario;
+    private int gameMode;
+    private static GameEngine instance = null;
 
     private GameEngine() {
-        int scenario = 99;  //ww2 map TO DO
-        int gameMode = 99; //1 for 1v1, 2 for 1vAI, 3 for AIvAI
+        players = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose a scenario!");
+        scenario = scanner.nextInt();
         while (gameMode < 1 || gameMode > 3) {
-            System.out.println("Choose a scenario!");
+            System.out.println("Choose a gamemode!");
             System.out.println("1. 1v1");
             System.out.println("2. 1vAI");
             System.out.println("3. AIvAI");
             System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
-            Scanner scanner = new Scanner(System.in);
 
             gameMode = scanner.nextInt();
             scanner.nextLine();
             if (gameMode == 4) {
                 System.out.println("Exiting the game.");
+                System.exit(0);
                 return;
             }
             if (gameMode > 4 || gameMode < 1) {
@@ -34,35 +33,43 @@ public class GameEngine {
                 return;
             }
         }
-        if(gameMode == 1) {
+        if (gameMode == 1) {
             System.out.println("Enter player 1 name: ");
-            Scanner scanner = new Scanner(System.in);
             String player1Name = scanner.nextLine();
             System.out.println("Enter player 2 name: ");
             String player2Name = scanner.nextLine();
             HashMap<String, Card> player1Hand = new HashMap<>();
             HashMap<String, Card> player2Hand = new HashMap<>();
-            this.player1 = new HumanPlayer(player1Name, player1Hand);
-            this.player2 = new HumanPlayer(player2Name, player2Hand);
-            players.add(this.player1);
-            players.add(this.player2);
+            players.add(HumanPlayer.getInstance(player1Name, player1Hand));
+            players.add(HumanPlayer.getInstance(player2Name, player2Hand));
         } else if (gameMode == 2) {
             System.out.println("Enter player name: ");
-            Scanner scanner = new Scanner(System.in);
             String playerName = scanner.nextLine();
             HashMap<String, Card> playerHand = new HashMap<>();
-            this.player1 = new HumanPlayer(playerName, playerHand);
-            this.aiPlayer1 = new AIPlayer("AI Player", new HashMap<>());
-            players.add(this.player1);
-            players.add(this.aiPlayer1);
+            players.add(HumanPlayer.getInstance(playerName, playerHand));
+            System.out.println("Choose AI difficulty:");
+            System.out.println("1. Easy");
+            System.out.println("2. Medium");
+            System.out.println("3. Hard");
+            int difficulty = scanner.nextInt();
+            players.add(AIPlayer.getInstance("AI Player", new HashMap<>(), difficulty));
         } else {
-            this.aiPlayer1 = new AIPlayer("AI Player 1", new HashMap<>());
-            this.aiPlayer2 = new AIPlayer("AI Player 2", new HashMap<>());
-            players.add(this.aiPlayer1);
-            players.add(this.aiPlayer2);
+            System.out.println("Choose AI 1 difficulty:");
+            System.out.println("1. Easy");
+            System.out.println("2. Medium");
+            System.out.println("3. Hard");
+            int difficulty = scanner.nextInt();
+            players.add(AIPlayer.getInstance("AI Player 1", new HashMap<>(), difficulty));
+            System.out.println("Choose AI 2 difficulty:");
+            System.out.println("1. Easy");
+            System.out.println("2. Medium");
+            System.out.println("3. Hard");
+            difficulty = scanner.nextInt();
+            players.add(AIPlayer.getInstance("AI Player 2", new HashMap<>(), difficulty));
         }
     }
-    GameEngine getInstance() {
+
+    public static GameEngine getInstance() {
         if (instance == null) {
             instance = new GameEngine();
         }
@@ -70,22 +77,22 @@ public class GameEngine {
     }
 
     public boolean isGameOver() {
-        if(player1.hasLost()) {
-            System.out.println(player2.name + "is victorious!");
+        if (players.get(0).hasLost()) {
+            System.out.println(players.get(1).name + " is victorious!");
             return true;
         }
-        if(player2.hasLost()) {
-            System.out.println(player1.name + "is victorious!");
+        if (players.get(1).hasLost()) {
+            System.out.println(players.get(0).name + " is victorious!");
             return true;
         }
         return false;
     }
 
-    public void Run() {
+    public void run() {
         int turn = 0;
-        while(!isGameOver()) {
+        while (!isGameOver()) {
             playRound(turn);
-            turn = (turn + 1)%2;
+            turn = (turn + 1) % 2;
         }
     }
 
@@ -94,7 +101,7 @@ public class GameEngine {
         GenericPlayer opponent = players.get((turn + 1) % 2);
         System.out.println(currentPlayer.name + "'s turn.");
 
-        if(currentPlayer instanceof HumanPlayer){
+        if (currentPlayer instanceof HumanPlayer) {
             System.out.println("Choose a card to play:");
             for (String cardName : currentPlayer.hand.keySet()) {
                 System.out.println(cardName);
@@ -110,8 +117,7 @@ public class GameEngine {
                 }
                 String targetCardName = scanner.nextLine();
                 targetCard = opponent.hand.get(targetCardName);
-            }
-            else if(currentCard instanceof HealingCard) {
+            } else if (currentCard instanceof HealingCard) {
                 System.out.println("Choose a target card to heal:");
                 for (String targetCardName : currentPlayer.hand.keySet()) {
                     System.out.println(targetCardName);
@@ -120,11 +126,10 @@ public class GameEngine {
                 targetCard = currentPlayer.hand.get(targetCardName);
             }
             currentPlayer.playCard(cardName, targetCard, opponent);
-        }
-        else if(currentPlayer instanceof AIPlayer) {
-            var cardToPlay = ((AIPlayer) currentPlayer).chooseWhatToPlay();
-            int cardIndex = cardToPlay.get(0);
-            int targetIndex = cardToPlay.get(1);
+        } else if (currentPlayer instanceof AIPlayer) {
+            var cardToPlay = ((AIPlayer) currentPlayer).chooseWhatToPlay(opponent, ((AIPlayer) currentPlayer).difficulty);
+            var cardIndex = cardToPlay.get(0);
+            var targetIndex = cardToPlay.get(1);
             String cardName = (String) currentPlayer.hand.keySet().toArray()[cardIndex];
             String targetCardName = (String) opponent.hand.keySet().toArray()[targetIndex];
             Card targetCard = opponent.hand.get(targetCardName);
