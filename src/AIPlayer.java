@@ -44,6 +44,11 @@ public class AIPlayer extends GenericPlayer {
         ArrayList<Integer> v = new ArrayList<>();
         if(difficulty == 1)
             v = chooseRandomCard(oppenent);
+        if(difficulty == 2)
+            v = chooseRandomCard(oppenent); //va fi alphabeta cu depth setat
+        if(difficulty == 3)
+            v = chooseRandomCard(oppenent); //va fi minmax cu full arbore
+        //optional ceva cu ML vad eu
         return v;
     }
 }
