@@ -11,6 +11,10 @@ public class HealingCard extends Card{
         this.healPower = healPower;
     }
 
+    public int getHealPower() {
+        return healPower;
+    }
+
     public void action(Card target) {
         target.HP += healPower;
     }

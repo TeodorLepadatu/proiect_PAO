@@ -14,4 +14,8 @@ public class AttackingCard extends Card{
     public void action(Card target) {
         target.HP -= attackPower;
     }
+
+    public int getAttackPower() {
+        return attackPower;
+    }
 }

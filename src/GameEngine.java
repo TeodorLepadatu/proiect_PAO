@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class GameEngine {
-    private ArrayList<GenericPlayer> players;
+    private final ArrayList<GenericPlayer> players;
     private final int scenario;
     private int gameMode;
     private static GameEngine instance = null;
@@ -69,6 +69,10 @@ public class GameEngine {
         }
     }
 
+    public int getScenario() {
+        return scenario;
+    }
+
     public static GameEngine getInstance() {
         if (instance == null) {
             instance = new GameEngine();
@@ -88,7 +92,7 @@ public class GameEngine {
         return false;
     }
 
-    public void run() {
+    public void run(int scenario) {
         int turn = 0;
         while (!isGameOver()) {
             playRound(turn);
