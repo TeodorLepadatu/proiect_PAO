@@ -82,7 +82,7 @@ public class GameEngine {
             return true;
         }
         if (players.get(1).hasLost()) {
-            System.out.println(players.get(0).name + " is victorious!");
+            System.out.println(players.getFirst().name + " is victorious!");
             return true;
         }
         return false;

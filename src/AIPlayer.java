@@ -10,10 +10,6 @@ public class AIPlayer extends GenericPlayer {
         this.difficulty = difficulty;
     }
 
-    public void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
-    }
-
     public static AIPlayer getInstance(String name, HashMap<String, Card> hand, int difficulty) {
         if (instance1 == null) {
             instance1 = new AIPlayer(name, hand, difficulty);
