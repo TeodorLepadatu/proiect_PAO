@@ -1,6 +1,5 @@
 # KARDS - EUROPEAN THEATER
 
-```markdown
 A turn-based card battle game implemented in Java, where players use cards with unique abilities to attack, heal, and strategize their way to victory. The game supports both human and AI players with varying difficulty levels.
 
 ## Features
