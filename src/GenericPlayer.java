@@ -3,15 +3,12 @@ import java.util.HashMap;
 abstract public class GenericPlayer {
     protected final String name;
     protected HashMap<String, Card> hand;
+    protected int movesPerTurn;
 
-    public GenericPlayer() {
-        this.name = "Unknown";
-        this.hand = new HashMap<>();
-    }
-
-    public GenericPlayer(String name, HashMap<String, Card> hand) {
+    public GenericPlayer(String name, HashMap<String, Card> hand, int movesPerTurn) {
         this.name = name;
         this.hand = hand;
+        this.movesPerTurn = movesPerTurn;
     }
 
     protected void playCard(String cardName, Card target, GenericPlayer opponent) {
@@ -28,10 +25,6 @@ abstract public class GenericPlayer {
 
     public void loseCard(Card card, GenericPlayer player) {
         player.hand.remove(card.name);
-    }
-
-    public void addCard(Card card, GenericPlayer player) {
-        player.hand.put(card.name, card);
     }
 
     public boolean hasLost() {

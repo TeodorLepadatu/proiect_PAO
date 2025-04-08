@@ -1,11 +1,6 @@
 public class AttackingCard extends Card{
     private final int attackPower;
 
-    public AttackingCard() {
-        super();
-        this.attackPower = 1;
-    }
-
     public AttackingCard(String name, int HP, int attackPower) {
         super(name, HP);
         this.attackPower = attackPower;

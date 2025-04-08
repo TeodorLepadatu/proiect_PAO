@@ -1,76 +1,132 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class GameEngine {
     private final ArrayList<GenericPlayer> players;
-    private final int scenario;
-    private int gameMode;
     private static GameEngine instance = null;
 
     private GameEngine() {
         players = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose a scenario!");
-        scenario = scanner.nextInt();
-        while (gameMode < 1 || gameMode > 3) {
-            System.out.println("Choose a gamemode!");
-            System.out.println("1. 1v1");
-            System.out.println("2. 1vAI");
-            System.out.println("3. AIvAI");
-            System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
 
-            gameMode = scanner.nextInt();
-            scanner.nextLine();
-            if (gameMode == 4) {
-                System.out.println("Exiting the game.");
-                System.exit(0);
-                return;
+        // Choose scenario
+        System.out.println("Choose a scenario:");
+        System.out.println("1: Germany vs. USSR");
+        System.out.println("2: Germany vs. France");
+        System.out.println("3: Italy vs. France");
+        System.out.println("4: Italy vs. England");
+        System.out.println("5: Germany vs. England");
+        int scenario = scanner.nextInt();
+        scanner.nextLine();
+
+        // Choose game mode
+        System.out.println("Choose game mode:");
+        System.out.println("1: Player vs Player");
+        System.out.println("2: Player vs AI");
+        System.out.println("3: AI vs AI");
+        int gameMode = scanner.nextInt();
+        scanner.nextLine();
+
+        Scenario scen = new Scenario(scenario);
+
+        ArrayList<Card> deck1;
+        ArrayList<Card> deck2;
+        String name1, name2;
+
+        switch (scenario) {
+            case 1 -> {
+                deck1 = scen.getGermanyDeck();
+                deck2 = scen.getSovietDeck();
+                name1 = "Germany";
+                name2 = "USSR";
             }
-            if (gameMode > 4 || gameMode < 1) {
-                System.out.println("Invalid choice. Please try again.");
-                return;
+            case 2 -> {
+                deck1 = scen.getGermanyDeck();
+                deck2 = scen.getFranceDeck();
+                name1 = "Germany";
+                name2 = "France";
+            }
+            case 3 -> {
+                deck1 = scen.getItalyDeck();
+                deck2 = scen.getFranceDeck();
+                name1 = "Italy";
+                name2 = "France";
+            }
+            case 4 -> {
+                deck1 = scen.getItalyDeck();
+                deck2 = scen.getUKDeck();
+                name1 = "Italy";
+                name2 = "England";
+            }
+            case 5 -> {
+                deck1 = scen.getGermanyDeck();
+                deck2 = scen.getUKDeck();
+                name1 = "Germany";
+                name2 = "England";
+            }
+            default -> {
+                System.out.println("Invalid scenario, defaulting to Germany vs USSR.");
+                deck1 = scen.getGermanyDeck();
+                deck2 = scen.getSovietDeck();
+                name1 = "Germany";
+                name2 = "USSR";
             }
         }
-        if (gameMode == 1) {
-            System.out.println("Enter player 1 name: ");
-            String player1Name = scanner.nextLine();
-            System.out.println("Enter player 2 name: ");
-            String player2Name = scanner.nextLine();
-            HashMap<String, Card> player1Hand = new HashMap<>();
-            HashMap<String, Card> player2Hand = new HashMap<>();
-            players.add(HumanPlayer.getInstance(player1Name, player1Hand));
-            players.add(HumanPlayer.getInstance(player2Name, player2Hand));
-        } else if (gameMode == 2) {
-            System.out.println("Enter player name: ");
-            String playerName = scanner.nextLine();
-            HashMap<String, Card> playerHand = new HashMap<>();
-            players.add(HumanPlayer.getInstance(playerName, playerHand));
-            System.out.println("Choose AI difficulty:");
-            System.out.println("1. Easy");
-            System.out.println("2. Medium");
-            System.out.println("3. Hard");
-            int difficulty = scanner.nextInt();
-            players.add(AIPlayer.getInstance("AI Player", new HashMap<>(), difficulty));
-        } else {
-            System.out.println("Choose AI 1 difficulty:");
-            System.out.println("1. Easy");
-            System.out.println("2. Medium");
-            System.out.println("3. Hard");
-            int difficulty = scanner.nextInt();
-            players.add(AIPlayer.getInstance("AI Player 1", new HashMap<>(), difficulty));
-            System.out.println("Choose AI 2 difficulty:");
-            System.out.println("1. Easy");
-            System.out.println("2. Medium");
-            System.out.println("3. Hard");
-            difficulty = scanner.nextInt();
-            players.add(AIPlayer.getInstance("AI Player 2", new HashMap<>(), difficulty));
-        }
-    }
 
-    public int getScenario() {
-        return scenario;
+        NationConfig config1 = new NationConfig(deck1);
+        NationConfig config2 = new NationConfig(deck2);
+
+        double avgPower1 = config1.calculateAveragePower(deck1);
+        double avgPower2 = config2.calculateAveragePower(deck2);
+
+        int moves1 = avgPower1 >= avgPower2 ? config1.getMovesPerTurn() : config2.getMovesPerTurn();
+        int moves2 = avgPower1 < avgPower2 ? config1.getMovesPerTurn() : config2.getMovesPerTurn();
+
+        // Sort decks by total card power (descending)
+        Comparator<Card> powerComparator = (a, b) -> {
+            int powerA = a.HP + (a instanceof AttackingCard ? ((AttackingCard) a).getAttackPower() : (a instanceof HealingCard ? ((HealingCard) a).getHealPower() : 0));
+            int powerB = b.HP + (b instanceof AttackingCard ? ((AttackingCard) b).getAttackPower() : (b instanceof HealingCard ? ((HealingCard) b).getHealPower() : 0));
+            return Integer.compare(powerB, powerA);
+        };
+        deck1.sort(powerComparator);
+        deck2.sort(powerComparator);
+
+        GenericPlayer player1, player2;
+
+        switch (gameMode) {
+            case 1 -> {
+                player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
+                player2 = HumanPlayer.getInstance(name2 + " Player", new HashMap<>(), moves2);
+            }
+            case 2 -> {
+                System.out.println("Choose AI difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                int difficulty = scanner.nextInt();
+                player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
+                player2 = AIPlayer.getInstance(name2 + " AI", new HashMap<>(), moves2, difficulty);
+            }
+            case 3 -> {
+                System.out.println("Choose AI1 difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                int difficulty1 = scanner.nextInt();
+                System.out.println("Choose AI2 difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                int difficulty2 = scanner.nextInt();
+                player1 = AIPlayer.getInstance(name1 + " AI1", new HashMap<>(), moves1, difficulty1);
+                player2 = AIPlayer.getInstance(name2 + " AI2", new HashMap<>(), moves2, difficulty2);
+            }
+            default -> {
+                System.out.println("Invalid game mode. Defaulting to PvP.");
+                player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
+                player2 = HumanPlayer.getInstance(name2 + " Player", new HashMap<>(), moves2);
+            }
+        }
+
+        for (Card card : deck1) {
+            player1.hand.put(card.name, card);
+        }
+        for (Card card : deck2) {
+            player2.hand.put(card.name, card);
+        }
+
+        players.add(player1);
+        players.add(player2);
     }
 
     public static GameEngine getInstance() {
@@ -92,7 +148,7 @@ public class GameEngine {
         return false;
     }
 
-    public void run(int scenario) {
+    public void run() {
         int turn = 0;
         while (!isGameOver()) {
             playRound(turn);
@@ -103,41 +159,94 @@ public class GameEngine {
     private void playRound(int turn) {
         GenericPlayer currentPlayer = players.get(turn);
         GenericPlayer opponent = players.get((turn + 1) % 2);
-        System.out.println(currentPlayer.name + "'s turn.");
+        int movesAllowed = currentPlayer.movesPerTurn;
+        System.out.println("\n" + currentPlayer.name + "'s turn. They are allowed " + movesAllowed + " move(s) this turn.");
 
-        if (currentPlayer instanceof HumanPlayer) {
-            System.out.println("Choose a card to play:");
-            for (String cardName : currentPlayer.hand.keySet()) {
-                System.out.println(cardName);
+        for (int move = 1; move <= movesAllowed; move++) {
+            GraphicsInterface.displayHands(currentPlayer, opponent);
+            if (currentPlayer.hand.isEmpty()) {
+                System.out.println(currentPlayer.name + " has no more cards to play.");
+                break;
             }
-            Scanner scanner = new Scanner(System.in);
-            String cardName = scanner.nextLine();
-            Card targetCard = null;
-            Card currentCard = currentPlayer.hand.get(cardName);
-            if (currentCard instanceof AttackingCard) {
-                System.out.println("Choose a target card:");
-                for (String targetCardName : opponent.hand.keySet()) {
-                    System.out.println(targetCardName);
+            System.out.println("Move " + move + " of " + movesAllowed + ":");
+
+            if (currentPlayer instanceof HumanPlayer) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("Choose a card to play (enter the card name):");
+                for (String cardName : currentPlayer.hand.keySet()) {
+                    System.out.println(cardName);
                 }
-                String targetCardName = scanner.nextLine();
-                targetCard = opponent.hand.get(targetCardName);
-            } else if (currentCard instanceof HealingCard) {
-                System.out.println("Choose a target card to heal:");
-                for (String targetCardName : currentPlayer.hand.keySet()) {
-                    System.out.println(targetCardName);
+                String cardName = scanner.nextLine();
+                if (!currentPlayer.hand.containsKey(cardName)) {
+                    System.out.println("Invalid card name. Skipping this move.");
+                    continue;
                 }
-                String targetCardName = scanner.nextLine();
-                targetCard = currentPlayer.hand.get(targetCardName);
+                Card currentCard = currentPlayer.hand.get(cardName);
+                Card targetCard = null;
+                if (currentCard instanceof AttackingCard) {
+                    if (opponent.hand.isEmpty()) {
+                        System.out.println("Opponent has no cards to target! Skipping this move.");
+                        continue;
+                    }
+                    System.out.println("Choose a target card from the opponent's hand:");
+                    for (String targetCardName : opponent.hand.keySet()) {
+                        System.out.println(targetCardName);
+                    }
+                    String targetCardName = scanner.nextLine();
+                    if (!opponent.hand.containsKey(targetCardName)) {
+                        System.out.println("Invalid target card. Skipping this move.");
+                        continue;
+                    }
+                    targetCard = opponent.hand.get(targetCardName);
+                } else if (currentCard instanceof HealingCard) {
+                    System.out.println("Choose a target card from your own hand to heal:");
+                    for (String targetCardName : currentPlayer.hand.keySet()) {
+                        System.out.println(targetCardName);
+                    }
+                    String targetCardName = scanner.nextLine();
+                    if (!currentPlayer.hand.containsKey(targetCardName)) {
+                        System.out.println("Invalid target card. Skipping this move.");
+                        continue;
+                    }
+                    targetCard = currentPlayer.hand.get(targetCardName);
+                }
+                currentPlayer.playCard(cardName, targetCard, opponent);
+            } else if (currentPlayer instanceof AIPlayer ai) {
+                ArrayList<ArrayList<Integer>> moveChoices = ai.chooseWhatToPlay(opponent, ai.difficulty);
+
+                if (moveChoices == null || moveChoices.isEmpty()) {
+                    System.out.println(currentPlayer.name + " did not choose valid moves. Skipping turn.");
+                    return;
+                }
+
+                for (ArrayList<Integer> moveChoice : moveChoices) {
+                    if (moveChoice.size() < 2) continue;
+
+                    String[] currentKeys = currentPlayer.hand.keySet().toArray(new String[0]);
+                    String[] opponentKeys = opponent.hand.keySet().toArray(new String[0]);
+                    int cardIndex = moveChoice.get(0);
+                    int targetIndex = moveChoice.get(1);
+
+                    if (cardIndex >= currentKeys.length) continue;
+                    String cardName = currentKeys[cardIndex];
+                    Card currentCard = currentPlayer.hand.get(cardName);
+                    Card targetCard = null;
+
+                    if (currentCard instanceof AttackingCard) {
+                        if (targetIndex >= opponentKeys.length) continue;
+                        String targetCardName = opponentKeys[targetIndex];
+                        targetCard = opponent.hand.get(targetCardName);
+                        System.out.println(currentPlayer.name + " played " + cardName + " to attack " + targetCardName + ".");
+                    } else if (currentCard instanceof HealingCard) {
+                        if (targetIndex >= currentKeys.length) continue;
+                        String targetCardName = currentKeys[targetIndex];
+                        targetCard = currentPlayer.hand.get(targetCardName);
+                        System.out.println(currentPlayer.name + " played " + cardName + " to heal " + targetCardName + ".");
+                    }
+
+                    currentPlayer.playCard(cardName, targetCard, opponent);
+                }
             }
-            currentPlayer.playCard(cardName, targetCard, opponent);
-        } else if (currentPlayer instanceof AIPlayer) {
-            var cardToPlay = ((AIPlayer) currentPlayer).chooseWhatToPlay(opponent, ((AIPlayer) currentPlayer).difficulty);
-            var cardIndex = cardToPlay.get(0);
-            var targetIndex = cardToPlay.get(1);
-            String cardName = (String) currentPlayer.hand.keySet().toArray()[cardIndex];
-            String targetCardName = (String) opponent.hand.keySet().toArray()[targetIndex];
-            Card targetCard = opponent.hand.get(targetCardName);
-            currentPlayer.playCard(cardName, targetCard, opponent);
         }
     }
 }
