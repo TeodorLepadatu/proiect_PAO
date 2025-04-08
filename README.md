@@ -60,29 +60,8 @@ Follow the on-screen instructions to select the game mode and difficulty level.
 - **Healing Cards**: Target friendly cards to restore their health.
 - The game ends when one player's cards are all defeated.
 
-## Project Structure
-
-```
-src/
-├── Main.java          # Entry point of the game
-├── GameEngine.java    # Core game logic
-├── GenericPlayer.java # Base class for players
-├── HumanPlayer.java   # Human player implementation
-├── AIPlayer.java      # AI player implementation
-├── Card.java          # Base class for cards
-├── AttackingCard.java # Attacking card implementation
-├── HealingCard.java   # Healing card implementation
-```
 
 ## Requirements
 
 - Java 17 or higher
 
-## Contributing
-
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the game.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-```
