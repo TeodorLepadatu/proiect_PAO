@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AIPlayer extends GenericPlayer {
+public non-sealed class AIPlayer extends GenericPlayer {
     private static AIPlayer instance1 = null;
     private static AIPlayer instance2 = null;
-    public int difficulty; // 1 = easy, 2 = medium, 3 = hard, 4 = impossible
+    public int difficulty; // 1 = easy, 2 = medium, 3 = hard
 
     private AIPlayer(String name, HashMap<String, Card> hand, int movesPerTurn, int difficulty) {
         super(name, hand, movesPerTurn);
@@ -65,9 +65,6 @@ public class AIPlayer extends GenericPlayer {
                 break;
             case 3:
                 // Some ML logic for hard difficulty
-                break;
-            case 4:
-                // Minimax logic for impossible difficulty (always the best moves)
                 break;
             default:
                 System.out.println("Invalid difficulty level. Defaulting to easy.");

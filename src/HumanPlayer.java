@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-public class HumanPlayer extends GenericPlayer {
+public non-sealed class HumanPlayer extends GenericPlayer {
     private static HumanPlayer instance1 = null;
     private static HumanPlayer instance2 = null;
 

@@ -98,15 +98,36 @@ public class GameEngine {
                 player2 = HumanPlayer.getInstance(name2 + " Player", new HashMap<>(), moves2);
             }
             case 2 -> {
-                System.out.println("Choose AI difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                System.out.println("Choose AI difficulty (1: Easy, 2: Medium, 3: Hard):");
                 int difficulty = scanner.nextInt();
-                player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
-                player2 = AIPlayer.getInstance(name2 + " AI", new HashMap<>(), moves2, difficulty);
+                System.out.println("Choose the nation that you want to play:");
+                System.out.println("1: " + name1);
+                System.out.println("2: " + name2);
+                int playerNation = scanner.nextInt();
+                scanner.nextLine();
+                if (playerNation == 1) {
+                    player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
+                    player2 = AIPlayer.getInstance(name2 + " AI", new HashMap<>(), moves2, difficulty);
+                } else if (playerNation == 2) {
+                    player1 = AIPlayer.getInstance(name1 + " AI", new HashMap<>(), moves1, difficulty);
+                    player2 = HumanPlayer.getInstance(name2 + " Player", new HashMap<>(), moves2);
+                } else {
+                    System.out.println("Invalid choice. Defaulting to a random nation.");
+                    Random random = new Random();
+                    int randomNation = random.nextInt(2) + 1;
+                    if (randomNation == 1) {
+                        player1 = HumanPlayer.getInstance(name1 + " Player", new HashMap<>(), moves1);
+                        player2 = AIPlayer.getInstance(name2 + " AI", new HashMap<>(), moves2, difficulty);
+                    } else{
+                        player1 = AIPlayer.getInstance(name1 + " AI", new HashMap<>(), moves1, difficulty);
+                        player2 = HumanPlayer.getInstance(name2 + " Player", new HashMap<>(), moves2);
+                    }
+                }
             }
             case 3 -> {
-                System.out.println("Choose AI1 difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                System.out.println("Choose AI1 difficulty (1: Easy, 2: Medium, 3: Hard):");
                 int difficulty1 = scanner.nextInt();
-                System.out.println("Choose AI2 difficulty (1: Easy, 2: Medium, 3: Hard, 4: Impossible):");
+                System.out.println("Choose AI2 difficulty (1: Easy, 2: Medium, 3: Hard):");
                 int difficulty2 = scanner.nextInt();
                 player1 = AIPlayer.getInstance(name1 + " AI1", new HashMap<>(), moves1, difficulty1);
                 player2 = AIPlayer.getInstance(name2 + " AI2", new HashMap<>(), moves2, difficulty2);

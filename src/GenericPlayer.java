@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-abstract public class GenericPlayer {
+abstract public sealed class GenericPlayer permits HumanPlayer, AIPlayer {
     protected final String name;
     protected HashMap<String, Card> hand;
     protected int movesPerTurn;
