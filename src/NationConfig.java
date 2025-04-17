@@ -9,7 +9,7 @@ public class NationConfig {
         }
         int total = 0;
         for (Card card : deck) {
-            total += card.HP;
+            total += card.hp;
             if (card instanceof AttackingCard) {
                 total += ((AttackingCard) card).getAttackPower();
             } else if (card instanceof HealingCard) {

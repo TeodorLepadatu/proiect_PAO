@@ -18,7 +18,7 @@ abstract public sealed class GenericPlayer permits HumanPlayer, AIPlayer {
         }
         Card card = hand.get(cardName);
         card.action(target);
-        if (target.HP <= 0) {
+        if (target.hp <= 0) {
             opponent.loseCard(target, opponent);
         }
     }

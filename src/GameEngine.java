@@ -83,8 +83,8 @@ public class GameEngine {
 
         // Sort decks by total card power (descending)
         Comparator<Card> powerComparator = (a, b) -> {
-            int powerA = a.HP + (a instanceof AttackingCard ? ((AttackingCard) a).getAttackPower() : (a instanceof HealingCard ? ((HealingCard) a).getHealPower() : 0));
-            int powerB = b.HP + (b instanceof AttackingCard ? ((AttackingCard) b).getAttackPower() : (b instanceof HealingCard ? ((HealingCard) b).getHealPower() : 0));
+            int powerA = a.hp + (a instanceof AttackingCard ? ((AttackingCard) a).getAttackPower() : (a instanceof HealingCard ? ((HealingCard) a).getHealPower() : 0));
+            int powerB = b.hp + (b instanceof AttackingCard ? ((AttackingCard) b).getAttackPower() : (b instanceof HealingCard ? ((HealingCard) b).getHealPower() : 0));
             return Integer.compare(powerB, powerA);
         };
         deck1.sort(powerComparator);

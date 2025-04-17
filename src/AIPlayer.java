@@ -47,7 +47,7 @@ public non-sealed class AIPlayer extends GenericPlayer {
                 targetIndex = (int) (Math.random() * opponentCardNames.size());
                 move.add(targetIndex);
             } else {
-                continue; // Skip unknown card types
+                continue; // skip unknown card types
             }
 
             moves.add(move);
@@ -61,10 +61,10 @@ public non-sealed class AIPlayer extends GenericPlayer {
             case 1:
                 return chooseRandomCard(opponent);
             case 2:
-                // Alpha-beta pruning logic for low depth for medium difficulty
+                // alpha-beta pruning
                 break;
             case 3:
-                // Some ML logic for hard difficulty
+                // ML
                 break;
             default:
                 System.out.println("Invalid difficulty level. Defaulting to easy.");

@@ -9,7 +9,7 @@ abstract public class GraphicsInterface {
         String[] lines = new String[5];
         lines[0] = "+---------------------------+";
         lines[1] = String.format("| Name: %-19s|", card.name);
-        lines[2] = String.format("| HP: %-21d|", card.HP);
+        lines[2] = String.format("| HP: %-21d|", card.hp);
 
         if (card instanceof AttackingCard attackCard) {
             lines[3] = String.format("| Attack: %-17d|", attackCard.getAttackPower());

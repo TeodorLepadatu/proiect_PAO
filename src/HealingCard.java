@@ -1,8 +1,8 @@
 public class HealingCard extends Card{
     private final int healPower;
 
-    public HealingCard(String name, int HP, int healPower) {
-        super(name, HP);
+    public HealingCard(String name, int hp, int healPower) {
+        super(name, hp);
         this.healPower = healPower;
     }
 
@@ -10,7 +10,8 @@ public class HealingCard extends Card{
         return healPower;
     }
 
+    @Override
     public void action(Card target) {
-        target.HP += healPower;
+        target.hp += healPower;
     }
 }

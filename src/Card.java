@@ -1,15 +1,15 @@
 abstract public class Card {
     protected final String name;
-    protected int HP;
+    protected int hp;
 
     public Card(){
         this.name = "Unknown";
-        this.HP = 1;
+        this.hp = 1;
     }
 
-    public Card(String name, int HP) {
+    public Card(String name, int hp) {
         this.name = name;
-        this.HP = HP;
+        this.hp = hp;
     }
 
     abstract public void action(Card target);
